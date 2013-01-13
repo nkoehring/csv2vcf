@@ -19,9 +19,16 @@ def value? v
 end
 
 
-csv = CSV.read('/home/nk/Downloads/export_addressbook.csv')
+begin
+ csv = CSV.parse($stdin.read)
+rescue
+  puts "USAGE:"
+  puts "csv2vcf.rb < /file/to/import > /file/to/export"
+  exit 1
+end
 
 headers = csv.shift
+
 NPREFIX = headers.index('n_prefix')
 NSUFFIX = headers.index('n_suffix')
 NMIDDLE = headers.index('n_middle')
@@ -36,10 +43,8 @@ TELHOME = headers.index('tel_work')
 TELWORK = headers.index('tel_home')
 JABBER = headers.index('Jabber')
 
-vcards = []
-
 csv.each do |entry|
-  vcards << Vpim::Vcard::Maker.make do |card|
+  vcard = Vpim::Vcard::Maker.make do |card|
     card.add_name do |name|
       name.prefix = entry[NPREFIX] if value? entry[NPREFIX]
       name.additional = entry[NMIDDLE] if value? entry[NMIDDLE]
@@ -57,8 +62,8 @@ csv.each do |entry|
     card.add_email(entry[EMAILHOME]) if value? entry[EMAILHOME]
     card.add_impp("xmpp:"+entry[JABBER]) if value? entry[JABBER]
   end
+  
+  puts vcard
+  puts
 end
 
-File.open('output.vcf', 'w') do |f|
-  f.write(vcards.join('\n\n'))
-end
