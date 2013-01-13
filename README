@@ -1,0 +1,4 @@
+This script converts contact data from Tine2.0 CSV export into a vcard file.
+As it only handles fields of interest, you may want to extend it to your needs.
+
+Uses vpim package: http://vpim.rubyforge.org/
